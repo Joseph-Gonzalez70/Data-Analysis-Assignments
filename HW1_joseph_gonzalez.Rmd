@@ -1,0 +1,292 @@
+---
+title: "Homework 1"
+author: "Joseph Gonzalez"
+date: "4/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+#Packages
+library(Matrix)
+library(dplyr)
+
+```
+
+## Problem 1 Vectors and Simulation 
+
+Create the vectors animals, colors, and attributes:
+```{r, include=TRUE}
+animals=c( "cat", "dog", "cow", "squirrel") #c() allows us to create vectors
+colors=c("white", "black", "brown", "red")
+attributes=c("big", "small", "angry", "cute", "finicky")
+```
+
+**#Part A**
+
+Generate random samples with replacement of size 100 from each of the types. I will use the sample function.
+```{r,include=TRUE}
+set.seed(100) #allows for reproducibility
+Animal=sample(animals,100, replace = TRUE) #we want a sample size of 100 from each group.
+Color=sample(colors,100, replace = TRUE)   #replace=TRUE allows for the function to select 100 points from the gi-ven sets
+Attribute=sample(attributes,100, replace = TRUE) 
+```
+
+**#Part B**
+
+To compute how many animals are cats or dogs, I will use the which and length function. The which function identifies the locations in the Animal vector where a cat or dog is present. This function will output a vector of locations and the length function can be used to tally the total number of cats or dogs.
+```{r,include=TRUE}
+length(which(Animal=='cat' | Animal=='dog')) #The which function looks for the locations where the logical operator is true. The "|" allows us to find the places where the observation is a cat or dog.
+```
+There are 44 occurences where the Animal vector had a cat or dog.
+
+**#Part C**
+
+I will combine the results to produce phrases (character strings) describing the animals("big white dog") using the paste function. I will print only first ten for simplicity.
+
+```{r,include=TRUE}
+paste(Attribute,Color,Animal, sep=' ')[1:10]
+```
+
+**#Part D** 
+
+Creating a contigency table:
+For this problem, I will use the table function:
+```{r,include=TRUE}
+table(Animal, Attribute)
+```
+This function categorizes the observations by the type of animal and the attribute the animal possesses. It also counts the number of observations that appear under the same animal and attribute.
+
+##Matrices
+
+**#Part A**
+
+Create a matrix A and vector y corresponding to matrix equation Ax=y, where A$\in \mathbb{R}^{(5*5)}$ and x, y$\in \mathbb{R}^{5}$:
+To do this, I will first initialize a matrix of zeros that fits the required dimensions. Then, I will assign values corresponding to the given equations. I will form y by the c() function.
+
+```{r pressure, include=TRUE }
+A=matrix(0,5,5,byrow = TRUE) #matrix() lets us create an intial matrix.
+A[1,]=c(1,2,3,4,5)  #We can then build the matrix by subsetting and using the c() to place values into the rows.
+A[2,]=c(2,1,2,3,4)
+A[3,]=c(3,2,1,2,3)
+A[4,]=c(4,3,2,1,2)
+A[5,]=c(5,4,3,2,1)
+A                   #Confirm the matrix is correct
+y=c(7,-1,-3,5,17)   #Use c() do initialize y as a vector
+```
+
+**#Part B**
+
+Is matrix A invertible?
+A matrix is invertible when the determinant is non-zero.
+We can use the det() function to see whether the determinant is non-zero.
+```{r,include=TRUE}
+det(A)
+rankMatrix(A)[1]
+solve(A)
+```
+
+The determinant is non-zero, therefore matrix A is invertible. We can also use the rank() function in the "Matrix" package to see that matrix A is of full rank(all columns are independent). Lastly, we can use solve() to actually determine the inverse of matrix A.
+
+
+**#Part C**
+
+Find solution of the system of linear equations:
+To find x, we can use the solve() function.
+```{r,include=TRUE}
+solve(A,y)
+```
+The solve function calculates x = $A^{-1}y$. The above values are the vector x.
+
+**#part D**
+
+Verify the solution is correct:
+To verify, we can conduct matrix multiplication of A and x.
+```{r,include=TRUE}
+x=solve(A,y)
+A%*%x
+```
+
+The result is the values of the y vector. Therefore, the solution is verified.
+
+##Data Exploration
+
+First load the data using load() function and check for missing values:
+```{r,include=TRUE}
+load("countypop.RData") #We can also import the dataset using file->open file.
+attach(countypop)
+head(countypop)
+all(is.na(countypop$fips)==FALSE) 
+#is.na returns boolean vector. A vector with all falses indicates no missing values are present. We check to see that this vector is all FALSE using the logical operator "==".
+all(is.na(countypop$abbr)==FALSE) 
+all(is.na(countypop$county)==FALSE) 
+#If the all function returns true, then there are no missing values because the is.na() returned only falses.
+all(is.na(countypop$pop_2015)==FALSE) 
+sapply(countypop,class) #Checks what type of data we have. If a suspected numeric shows up as factor, this indicates that a missing values may be present.
+```
+No missing values are present in data.
+
+**#Part A**
+
+Total of unique 2-letter state abbreviations:
+We can use the table() function to get the list of unique 2-letter options and use the length() to tally them.
+```{r,include=TRUE}
+length(table(countypop$abbr))
+```
+There are 51 unique 2-letter state abbreviations.
+
+**#Part B**
+
+Total number of counties:
+```{r,include=TRUE}
+#First check to see if a county might be listed twice for a single state
+which(countypop$county=="Logan County")
+countypop[153,]
+countypop[283,]
+#Doesn't seem to be repeats for each county. In the description, fips is the 5 digit code for each county(best to use fips since there are repeated county names for different states). If the total of unique fips is equal to the total sample size that will be the total number of counties
+length(table(countypop$fips)) #use table to be sure the fips are unique.
+```
+The total number of counties in the US is 3142
+
+**#Part C**
+
+Unique county names:
+For this problem, I will use the length() and table() function.
+```{r,include=TRUE}
+length(table(countypop$county)) 
+#Table will output unique county names. It also counts for the number of times the county appears in the dataset, but we don't care about repeats.
+```
+There are 1877 unique county names.
+
+**#part D**
+
+Find the top 10 most common county names:
+To find the top county names, I will use table() to tally the number of times a county name appears and then use sort() to order the output in decreasing order.
+
+```{r,include=TRUE}
+sort(table(countypop$county), decreasing=TRUE)[1:10] 
+#The [1:10] will display only 10 outputs
+```
+The top 10 most common county names are Washington County, Jefferson County, Franklin County, Jackson County, Lincoln County, Madison County, Clay County, Montgomery County, Marion County, Monroe County.
+
+**#Part E**
+
+We want to find the state that has the largest/smallest number of counties.
+To solve this, we would just need to total the number of times each state appears in the data set. I will use the table() and sort() functions.
+```{r,include=TRUE}
+table(countypop$abbr)
+sort(table(countypop$abbr),decreasing=TRUE)[1] #This will give us the state with the most counties(decreasing order)
+sort(table(countypop$abbr))[1] #This will give us the state with the smallest number of counties(increasing order)
+```
+Texas has the largest number of counties(254) and DC has the smallest number of counties(1).
+
+**#Part F**
+
+Average population of a county in the US:
+I will take the average of all counties using mean().
+```{r,include=TRUE}
+mean(countypop$pop_2015) #This averages all the observations of county populations in the data set
+```
+The exact average population of a county is 102297.5 people. We can say it is approximately 102298 people because we can't have a 0.5 of a person.
+
+**#Part G**
+
+We want to find the state that has the largest county in terms of population.
+We can use the max() and which function to find the place that the largest population occurs.
+```{r,include=TRUE}
+Locate=which(countypop$pop_2015==max(countypop$pop_2015)) #Gives use row where the largest population occurs.
+countypop$abbr[Locate] #We can use the value of Locate to find the state that has the largest population.
+countypop$pop_2015[Locate]
+countypop[Locate,]
+```
+CA has the largest county in terms of population. 10170292 people live in the largest county(Los Angeles County).
+
+**#Part H**
+
+Want to find the largest county in terms of population of each of the states:
+First, we will use the summarise function to find the max populations by state. Then, we can use the max population and the state abbreviation to find the location of the counties in the countypop data set. We use a logical & to make sure the state and population match(in case of repeated population values for other states).
+```{r,include=TRUE}
+datalarge=summarise(group_by(countypop,abbr),max(pop_2015)) #Group the data by state and find the max population.
+colnames(datalarge)=c("states","largestpop") 
+attach(datalarge)
+x=1:51#iterate the for loop over the 51 states in datalarge
+locatecounties=rep(0,51) #initialize a vector for location of largest counties
+for(i in x){
+  locatecounties[i]=which(pop_2015==largestpop[i] & abbr==states[i]) 
+  #we search for counties that match the state abbreviate and max population
+}
+topcounties=countypop$county[locatecounties] #Finds the top counties
+result=data.frame(cbind(datalarge$states,topcounties,datalarge$largestpop)) #Then organize results into a new data frame.
+result
+
+```
+The largest county in terms of population for each state is presented in the output above. Only first ten are showing.
+
+**#Part I**
+
+Average population of the 100 largest counties: For this problem, we can organize the pop_2015 column in the countypop data frame in decreasing order. Then, we can take the first 100 observations from the sort() function and use the mean() function to get the average.
+```{r,include=TRUE}
+orderpop=sort(countypop$pop_2015, decreasing=TRUE)[1:100]
+mean(orderpop)
+```
+The average population of the 100 largest counties in the US is 1370079 people.
+
+**#Part J**
+
+How many people live in each of the states: To do this problem, we will use tapply() and sum() functions. "tapply" allows to apply the sum function to subsets, categorized by the states, of the pop_2015 column. You can also use the summarise function and use group_by() to categorize by state and the use sum() to calculate the total population in each state.
+```{r,include=TRUE}
+tapply(countypop$pop_2015,countypop$abbr,sum)
+#other way
+summarise(group_by(countypop,abbr),sum(pop_2015))
+#check to confirm
+length(tapply(countypop$pop_2015,countypop$abbr,sum)) #We check to make sure all 51 states are present
+spotsAK=which(countypop$abbr=="AK") #check to confirm that the answers match
+sum(countypop$pop_2015[spotsAK])
+spotsWY=which(countypop$abbr=="WY") 
+sum(countypop$pop_2015[spotsWY])   
+#Using these commands for all the states would give us the correct answer, but it is tedious
+```
+The total population for each of the states is presented above.
+
+**#Part K**
+
+Average population of a county in California:
+For this problem, we will look for the location of the california counties in the countypop data frame. Then, we will use the mean() function to return the average population of a county.
+```{r,include=TRUE}
+CA.locate=which(countypop$abbr=="CA") #Finds where CA occurs in the data frame
+mean(countypop$pop_2015[CA.locate])  #This takes the mean of all the population values of the counties in california.
+#Since the population refers to people it might be best to round to the nearest whole number:
+round(mean(countypop$pop_2015[CA.locate]))
+##Other way
+#We can use filter to get a dataset for CA only. Then, we can use the mean() function on the population column in the filtered data set.
+CAdata=filter(countypop,abbr=="CA")
+round(mean(CAdata$pop_2015))
+```
+The average population of a county in calfornia is 674911(round up since we can have a 0.7 of a person)
+
+**#Part I**
+
+Average of a county in each of the states:
+We can use the tapply function to subset the population values with respect to the states and use the mean function.
+```{r,include=TRUE}
+tapply(countypop$pop_2015,countypop$abbr,mean)
+#Other way(Use summarize() and group be states and take the mean())
+summarise(group_by(countypop,abbr),mean(pop_2015))
+#we can check for a few things
+length(tapply(countypop$pop_2015,countypop$abbr,mean))
+spotsAL=which(countypop$abbr=="AL") #check to confirm that the answers match
+mean(countypop$pop_2015[spotsAL])
+spotsPA=which(countypop$abbr=="PA") #Doing this to all the states would give us the same answer.
+mean(countypop$pop_2015[spotsPA]) 
+```
+The exact average population for a county of each state is presented above. Since population refers to people, I would round the values to be logically accurate.
+
+```{r,include=TRUE}
+round(tapply(countypop$pop_2015,countypop$abbr,mean))
+```
+
+
+
