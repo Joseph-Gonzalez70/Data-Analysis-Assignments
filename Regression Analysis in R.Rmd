@@ -28,6 +28,8 @@ y <- 2+2*x1+0.3*x2+rnorm(n)
 
 **Part A**
 
+a. The last line of the code above corresponds to creating a linear model in which `y` is a function of `x1` and `x2`. Write out the form of the linear model. What are the values of the regression coefficients $\beta_0$, $\beta_1$ and $\beta_2$? What is the value of $\sigma^2$?
+
 Form of the linear model:
 
 $Y=\beta_0+\beta_1X_1+\beta_2X_2+\mathcal{E}$
@@ -49,12 +51,14 @@ set.seed(1)
 (sigma=sum(rnorm(n)^2)/(n-3))
 ```
 
-
 $\sigma^2= \frac{||e||^2}{n-p-1} =0.8356195$
 
 **Part B**
 
+b. What is the correlation coefficient between `x1` and `x2`? Create a scatter plot using `ggplot2` displaying the relationship between the variables `x1` and `x2`.
+
 For the correlation coefficient, we can use the cor() function. We can also use the ggplot function to visually represent their relationship.
+
 ```{r, include=TRUE}
 cor(x1,x2) #Correlation between x1 and x2
 data1=data.frame(cbind(x1,x2,y)) #Data frame for ggplot
@@ -65,6 +69,8 @@ The correlation coefficient $r=0.01703215$
 
 
 **Part C**
+
+c. Fit a least squares regression to predict `y` using `x1` and `x2`. Describe the obtained results. What are the values of $\hat\beta_0$, $\hat\beta_1$ and $\hat\beta_2$? How do these relate to the true values of $\beta_0$, $\beta_1$ and $\beta_2$? What is the value of $s$ and how does it relate to the true value of $\sigma^2$? Can you reject the null hypothesis $H_0:\beta_1=0$? How about the null hypothesis $H_0:\beta_2=0$?
 
 ```{r, include=TRUE}
 fit1=lm(y~x1+x2, data=data1)
@@ -83,6 +89,8 @@ The explanatory variables seem to have a positive relationship with the response
 
 **Part D**
 
+d. Now fit a least squares regression to predict `y` using only `x1`. Comment on your results. What are the values of $\hat\beta_0$ and $\hat\beta_1$? How do these relate to the true values of $\beta_0$ and $\beta_1$? What is the value of $s$ and how does it relate to the true value of $\sigma^2$? Can you reject the null hypothesis $H_0:\beta_1=0$?
+
 ```{r, include=TRUE}
 fit2=lm(y~x1, data=data1)
 summary(fit2)
@@ -97,6 +105,9 @@ $\hat\beta_1$=  1.9829
 The explanatory variable(x1) seems to have a positive relationship with the response variable. We can make this assumption since the coefficient is positive. The estimate $\hat\beta_0$ over-estimates $\beta_0$ by 4.5235. The estimate $\hat\beta_1$ under-estimates $\beta_1$ by 0.0171. The estimate s=1.267 and $s^2$=1.605. $s^2$ over-estimates $\sigma^2$. According to the t-value(4.168) and p-value(6.64e-05), we can reject the null hypothesis $H_0:\beta_1=0$ at a $\alpha$=0.001 significance level. 
 
 **Part E**
+ 
+e. Now fit a least squares regression to predict `y` using only `x2`. Comment on your results. What are the values of $\hat\beta_0$ and $\hat\beta_2$? How do these relate to the true values of $\beta_0$ and $\beta_2$? What is the value of $s$ and does it relate to the true value of $\sigma^2$? Can you reject the null hypothesis $H_0:\beta_2=0$?
+
 ```{r, include=TRUE}
 fit3=lm(y~x2, data=data1)
 summary(fit3)
@@ -123,9 +134,12 @@ y <- 2+2*x1+0.3*x2+rnorm(n)
 
 **Part a**
 
+a) Repeat parts b, c, d, and e of Exercise 1 using the new vectors `x1`, `x2` and `y`. What differences do you see between Exercise 1 and Exercise 2? Explain why these differences occur.
+
 Repeat parts b, c, d, abd e of exercise 1:
 
 **Part b**
+
 ```{r}
 cor(x1,x2)
 data2=data.frame(cbind(x1,x2,y))
@@ -135,6 +149,7 @@ ggplot(data1[,1:2], mapping=aes(x1,x2))+geom_point()+labs(title = "X2 vs. X1",x 
 Compared to problem one, x1 and x2 are more correlated with each other(r=0.998 compared to 0.01703). This occurs since x2 is a function of x1.
 
 **Part C**
+
 ```{r, include=TRUE}
 fit1=lm(y~x1+x2, data=data2)
 summary(fit1)
@@ -184,6 +199,7 @@ In this model, the variable(x2) seems to have a positive relationship with the r
 These differences occur because the variables, x1 and x2, are highly correlated in problem 2 and were lowly correlated in problem 1. When explanatory variables are highly correlated and within the same model, multicollinearity occurs. This means that there are many subsets of the coefficients that satisfy the least square criterion. The effect of one explanatory variable on the response variable highly depends on the other explanatory variable. Together the coefficients are not meaningful and, separately, we see they have significance. We can also see that the F-test is significant and the t-tests are not in the full model. This is saying, in the full model, that the marginal effect of each variable is not significant but there is signicance between the response variable and the group(x1,x2) of explanatory variables.
 
 **Problem 3**
+
 Add a new observation:
 
 ```{r, include=TRUE}
@@ -191,8 +207,9 @@ x1=c(x1,0.1)
 x2=c(x2,0.8)
 y=c(y,6)
 data3=data.frame(cbind(x1,x2,y))
-
 ```
+
+Re-fit the linear models from parts c, d and e of Exercise 1 using this new data. What effect does this new observation have on the each of the models? In each model, is this observation an outlier? A high-leverage point? Both? Explain your answers:
 
 Re-fit models from 1c, 1d, and 1e using new data. We want to evaluate the effect of the new observation on the models.
 
