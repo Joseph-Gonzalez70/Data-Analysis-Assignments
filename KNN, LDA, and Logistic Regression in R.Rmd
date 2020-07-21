@@ -18,9 +18,14 @@ attach(iris)
 
 ## HW 4
 
+# Classification
+
 **Problem 1**
 
+1. Consider Fisher's `iris` data set. Extract the data corresponding to the flower types  `versicolor` and `virginica`, numbering a total of `100` flowers. Set aside the first `10` observations for each flower type as test data and use the remaining data consisting of `80` observations (with flower types as class labels) as training data.
+
 For this homework we will consider fisher's iris data set.
+
 ```{r}
 iris1=iris[which(iris$Species != "setosa"),]
 data_versicolor=iris1[which(iris1$Species=="versicolor"),]
@@ -30,6 +35,8 @@ train_data=rbind(data_versicolor[11:50,],data_virginica[11:50,])
 ```
 
 **Problem 2**
+
+2. Use LDA for classifying the test data. Use `Sepal.Length` and `Sepal.Width` as the predictor variables (or features).
 
 We can use the lda() function for classifiication. Sepal length and sepal width are predictors.
 ```{r}
@@ -44,6 +51,7 @@ ifelse(lda_pred$posterior[,2]>0.5,"Virginica","Versicolor") #Species' name class
 
 
 **Part A**
+a) Report the class-specific means of the predictor variables for the training data.
 
 ```{r}
 #class specific means of the predictor variables:
@@ -59,6 +67,8 @@ For versicolor, the mean sepal length is 5.895 cm and the mean sepal width is 2.
 
 **Part B**
 
+b) Compute the confusion matrix for the test data and the misclassification error rate.
+
 Create a confusion table for the LDA results:
 
 ```{r}
@@ -71,7 +81,11 @@ The misclassification error rate is 0.4.
 
 **Question 3**
 
+3. Use the logistic model, fitted to the training data, to classify the test data:
+
 **Part A**
+
+a) Fit a logistic model to the training data, using the variables `Sepal.Length` and `Sepal.Width` as predictors.
 
 Fit the logistic model to the training data using sepal width and sepal length.
 
@@ -82,6 +96,8 @@ logreg1=glm(Species~Sepal.Length + Sepal.Width, data=train_data, family = binomi
 ```
 
 **Part A(i)**
+
+i. Obtain the estimates and their standard errors for the model parameters.
 
 ```{r}
 #We can show the entire summary of the fit using summary()
@@ -103,6 +119,8 @@ $\hat{\beta}_2$= 0.8173167;   $SE[\hat{\beta}_0]=1.0109006$
 
 **Part A(ii)**
 
+ii. Compute the confusion matrix for the test data and the misclassification error rate.
+
 We will form a confusion matrix and the misclassification error rate:
 
 ```{r}
@@ -120,10 +138,14 @@ The misclassification error rate is 0.4(40%).
 
 **Part A(iii)**
 
+iii. Are both of the predictor variables necessary for the purpose of classification? Explain your answer.
+
 According to the summary of the logistic regression, both predictors do not seem necessary for classification. Specifically, Sepal.Width is non-significant at a significance levels 0.20,0.10, and 0.05(Its p-value(0.418801)$>$ $\alpha$). Another indicator is that the difference between the null deviance and the residual deviance does not seem to have changed drastically when we have two predictors in the model. We would need to verify this with the residual deviance value of the model with only Sepal.Length as the predictor. lastly, we would also need to see how the confusion matrix and misclassification error rate would change after removing Sepal.Width from the model. If prediction accuracy increases or stays the same, then this would further support that Sepal.Width is not necessary for the model.
 
 
 **Part B**
+
+b) Fit a logistic regression model to the training data, using the variable `Sepal.Length` as a one-dimensional predictor.
 
 In this part, we fit a logistic regression model to the training data using Sepal.Length:
 
@@ -132,6 +154,9 @@ logreg2=glm(Species~Sepal.Length, data=train_data, family = binomial)
 ```
 
 **Part B(i)**
+
+i. Obtain the estimates and their standard errors for the model parameters.
+  
 We can use the summary() function to obtain the parameter estimates and standard errors:
 
 ```{r}
@@ -151,6 +176,8 @@ $\hat{\beta}_1$= 2.7647;    $SE[\hat{\beta}_0] = 0.6668$
 
 **Part B(ii)**
 
+ii. Compute the confusion matrix for the test data, and the misclassification error rate.
+
 Confusion Matrix and misclassification error rate:
 
 ```{r}
@@ -167,12 +194,16 @@ The misclassification error rate is 0.4(40%).
 
 **Part B(iii)**
 
+iii. Compare the results with those in 3(a). Does your result in 3(b)(ii) support the answer to 3(a)(iii)?
+
 Compared to 3(a), we first see that the p-value for Sepal.length's estimated coefficient is smaller(more significant) and its standard error is smaller(more accurate). We also see that there a small increase in residual deviance(0.666) and the AIC decreased by 1.334. Since there was only a small change in residual deviance, this means that Sepal.Width had little impact on improving the accuracy of the model(smaller residual deviance more accurate). We also favor models with a smaller AIC because it means less information was lost in the model.
 
 Yes, the result in 3(b)(ii) does support the answer in 3(a)(ii). After removing Sepal.Width from the model, we see that the confusion matrix and the misclassification error rate are the same. This means that Sepal.Width did not influence the classification prediction of the test data. 
 
 
 **Problem 4**
+
+4. Use the $k$-nearest neighbors ($k$-NN) classification method to classify the test data, using only `Sepal.Length` as the predictor variable. Perform this analysis using $k=1$ and $k=5$. In each case, compute the confusion matrix for the test data, and the misclassification error rate.
 
 For this problem, we can use the k-NN method classification method to classify the test data. We will only use sepal length. Also, we will perform the analysis using $k=1$ and $k=5$.
 
@@ -203,5 +234,7 @@ Next, we can see when k=5:
 When k=1, the misclassification error rate is 0.4.
 
 **Problem 5**
+
+5. Write a very brief summary (maximum of `100` words) about the comparative performance of the three different classification methods for this data set.
 
 For this dataset, each method performed similarly because they produced the same misclassification error rate(0.4). This means that each method had mis-classified the same number of observations. We can see that certain methods would be useful in particular situations(LDA or logistic regression to analyze the predictors). We also saw that, when k=1, knn produced a slightly lower mis-classification error rate than the rest of the methods. While this is compelling, we have to keep in mind that lower k leads to an overly flexible method(high variance) which could be problematic when trying to classify a new set of observations.
