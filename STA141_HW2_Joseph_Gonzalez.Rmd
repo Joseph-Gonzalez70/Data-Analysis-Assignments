@@ -1,0 +1,189 @@
+---
+title: "STA 141 HW 2"
+author: "Joseph Gonzalez"
+date: "4/24/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Simulation Study
+
+**Problem 1**
+
+Generate a single simple random sample of length 50 from the binomial distribution with k=10 and p=0.4. To generate this sample, we can use the rbinom() function.
+```{r, include=TRUE}
+n=50 #50 observations in the sample
+srand= rbinom(50,10,0.4) #generate the random sample
+```
+
+**Problem 2**
+
+We want a function that takes in an input and returns the estimates of k and p. We can write the function using function().
+```{r, include=TRUE}
+#The function takes in a sample vector.
+estimates = function(sinput){
+  n=length(srand) #size of sample
+  smean=mean(sinput) #mean of sample
+  sumdiff=sum((sinput-smean)^2) #The sum of the squared difference between the x values and the mean
+ khat=(smean^2)/(smean-(1/n)*sumdiff) #estimate of k
+ phat=smean/khat #estimate of p
+ 
+return(c(khat,phat)) #To return estimates of k and p 
+}
+estimates(srand) #Test the function
+```
+The generated values reflect estimates we would get when estimating k and p.
+
+**Problem 3**
+
+Generate N = 1000 samples of size n=50 and calculate 1000 estimates of k and 1000 estimates of p. I will attempt this problem by using matrices and an adjusted function of problem 2.
+```{r, include=TRUE}
+N=1000 #1000 samples
+n=50 #50 observations per sample
+srand=rbinom(1000*50,10,0.4) #generate the random sample
+#My steps for solving this problem are to place the random sample vector into
+#a 50 by 1000 matrix. Ultimately, we can use the apply function to get values 
+#from the columns. Each column represents a sample with 50 observations. There are
+#1000 columns.
+sampmatrix=matrix(srand,50,1000) 
+#I used a function to find the sum of the squared difference between 
+#the values and the column means.
+#This function is utilized in the apply function for the columns.
+sumdiff=function(values){
+  valmeans=mean(values)
+  sumdiffvals=sum((values-valmeans)^2) 
+  return(sumdiffvals)
+}
+
+estimates2 = function(sampmatrix){
+    smeans=apply(sampmatrix,2,mean)#mean of all 1000 samples
+    sumdiffs=apply(sampmatrix,2,sumdiff) 
+    #  sumdiffs is the sum of the squared difference between the x values and 
+    #the mean for all columns
+    khat=(smeans^2)/(smeans-(1/n)*sumdiffs) #estimates of k
+    phat=smeans/khat #estimates of p
+    return(cbind(khat,phat)) #To return estimates of k and p 
+}
+estimate.mat=estimates2(sampmatrix)
+#Show the number of estimates and the first 10 outputs:
+dim(estimate.mat)[1]
+estimate.mat[1:10,]
+```
+
+**Problem 4**
+
+Repeat problem 3 when n=100 and n=250. We can use the same function from 3. We just need to remember to change n.
+```{r, include=TRUE}
+#When n=100:
+n=100
+srand=rbinom(N*n,10,0.4) #Generate random values
+sampmatrix2=matrix(srand,n,N) #Create the sample matrix
+estimate.mat2=estimates2(sampmatrix2)
+#Show the number of estimates and the first 10 outputs:
+dim(estimate.mat2)[1]
+estimate.mat2[1:10,]
+#When n=250:
+N=1000
+n=250
+srand=rbinom(N*n,10,0.4)
+sampmatrix3=matrix(srand,n,N)
+estimate.mat3=estimates2(sampmatrix3)
+#Show the number of estimates and the first 10 outputs:
+dim(estimate.mat3)[1]
+estimate.mat3[1:10,]
+```
+
+**Problem 5**
+
+For each sample size, we will approximate the bias and mean squared error of $\hat{k}$ and $\hat{p}$:
+```{r, include=TRUE}
+#First, we start with n=50.
+#To the find the bias, we should find the expected value of khat and subtract 
+#the true value of khat.
+#To find MSE, we add the bias squared and the variance of the estimator.
+#For this problem, I will use a function to caluculate the bias and
+#mean squared error for khat and phat. The function will take in the
+#1000 by 2 matrix of estimates for k and p. 
+#It will also return a 2 by 2 matrix with the estimated values.
+Bias_MSE_funct=function(nummat){
+avgkhat=mean(nummat[,1]) #Average of the khats(expectation)
+biask=avgkhat-10 #Bias is the expected value minus the true value(10)
+MSEk=biask^2+var(nummat[,1]) #MSE is equal to the sum of the bias squared and the variance of khat.
+#For phat:
+avgphat=mean(nummat[,2])
+biasp=avgphat-0.4
+MSEp=biasp^2+var(estimate.mat[,2])
+results=matrix(c(biask,biasp,MSEk,MSEp),2,2, byrow=TRUE) #Create a 2 by 2 matrix with the estimates.
+colnames(results)=c("khat","phat") #Label the rows and columns
+rownames(results)=c("Bias" , "MSE")
+return(results)
+}
+#First, we start with n=50
+result=Bias_MSE_funct(estimate.mat)
+result
+#n=100
+result2=Bias_MSE_funct(estimate.mat2)
+result2
+#n=250
+result3=Bias_MSE_funct(estimate.mat3)
+result3
+```
+The estimators seem to overestimate the parameters. We can make this conclusion because the bias for $\hat{k}$ and $\hat{p}$ are positive for all n. When sample size increases, the bias and MSE for $\hat{k}$ and $\hat{p}$ decrease. This makes sense because, as the sample size increases, our estimate should get closer and closer to the population parameters k and p(law of large numbers).
+
+**Problem 6**
+**Part A:**
+
+The goal is to use ggplot to generate 3 box plots of the parameter estimates for when n=50, 100, and 200. We also have to include the true value of the parameter using geom_hline.
+```{r, include=TRUE}
+library(ggplot2)
+#First, we need to organize data so that ggplot can read it correctly
+nvalues=c(50,100,250) 
+combined_dat1=cbind(estimate.mat[,1],nvalues[1]) #Matrix with k values when n=50
+combined_dat2=cbind(estimate.mat2[,1],nvalues[2])#Matrix with k values when n=100
+combined_dat3=cbind(estimate.mat3[,1],nvalues[3])#Matrix with k values when n=250
+boxplotdata=data.frame(rbind(combined_dat1,combined_dat2,combined_dat3))
+#boxplotdata combines, by row, the k estimates and the associated n values.
+colnames(boxplotdata)=c("k_estimates","values_n")
+#Must change the values_n column to factor in order for ggplot to work properly
+boxplotdata$values_n=as.factor(boxplotdata$values_n) 
+#Full boxplot
+ggplot(data = boxplotdata, mapping = aes(x=values_n,y=k_estimates))+ geom_boxplot() + geom_hline(yintercept=10, color="red")+ggtitle("Box Plots For Estimates of k") +labs(y= "Estimates of k", x = "Sample Size n")
+
+```
+
+**Part B:**
+
+The previous graph is not informative because some of the $\hat{k}$ values are far away from the true value of the parameter. To remove estimates from the plot that are outside of the interval [0,50], we can use the filter() function.
+```{r, include=TRUE}
+#Filter the values so that we only have k estimates between 0 and 50
+library(dplyr)
+boxplotdatanew=filter(boxplotdata,boxplotdata$k_estimates>= 0 &boxplotdata$k_estimates<=50) 
+#Generate the new boxplots:
+ggplot(data = boxplotdatanew, mapping = aes(x=values_n,y=k_estimates))+ geom_boxplot() + geom_hline(yintercept=10, color="red")+ggtitle("Box Plots For Estimates of k") +labs(y= "Estimates of k", x = "Sample Size n")
+
+```
+
+After putting a constraint on the values, the boxplots are much more useful and interpretable.
+
+**Part C:**
+
+Using the same methods as before, we can create the boxplots for estimates of p.
+```{r, include=TRUE}
+#put all p estimates into one vector
+Pvals=c(estimate.mat[,2],estimate.mat2[,2],estimate.mat3[,2]) 
+#Then, we create a vector that contains the sample sizes
+#The locations of n correspond to the correct p estimates
+nvalues=c(rep(50,1000),rep(100,1000),rep(250,1000))
+#Create data frame that combines the p estimates vector and sample size vector
+Pdata=data.frame(cbind(Pvals,nvalues))
+colnames(Pdata)=c("pvals","nvalues")
+Pdata$nvalues=as.factor(Pdata$nvalues) #Change n column to factor for ggplot
+ggplot(data = Pdata, mapping = aes(x=nvalues,y=pvals))+ geom_boxplot() + geom_hline(yintercept=0.4, color="red")+ggtitle("Box Plots For Estimates of p") +labs(y= "Estimates of p", x = "Sample Size n")
+```
+
+**Part D:**
+
+When the sample size increases, we can see, in both plots, that the spread of the estimated values becomes smaller. In other words, the variance of the estimated parameters decreases(the distance between quartiles decreases). We can also see the  mean of the estimates gets closer to the true parameter value.
