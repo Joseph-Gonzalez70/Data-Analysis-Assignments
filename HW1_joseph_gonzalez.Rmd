@@ -13,10 +13,15 @@ knitr::opts_chunk$set(echo = TRUE)
 #Packages
 library(Matrix)
 library(dplyr)
-
 ```
 
 ## Problem 1 Vectors and Simulation 
+
+Suppose that we have:
+
++ four types of animals: `cat`, `dog`, `cow`, `squirrel`;
++ four possible colors: `white`, `black`, `brown`, `red`;
++ five possible attributes: `big`, `small`, `angry`, `cute`, `finicky`.
 
 Create the vectors animals, colors, and attributes:
 ```{r, include=TRUE}
@@ -27,7 +32,9 @@ attributes=c("big", "small", "angry", "cute", "finicky")
 
 **#Part A**
 
-Generate random samples with replacement of size 100 from each of the types. I will use the sample function.
+a. Generate random samples with replacement of size `100` from each of the types. Call the resulting vectors of character strings as: `Animal`, `Color`, `Attribute`. 
+
+To generate random samples with replacement of size 100 for each of the types, I will use the sample function.
 ```{r,include=TRUE}
 set.seed(100) #allows for reproducibility
 Animal=sample(animals,100, replace = TRUE) #we want a sample size of 100 from each group.
@@ -37,6 +44,8 @@ Attribute=sample(attributes,100, replace = TRUE)
 
 **#Part B**
 
+b. Compute how many animals in the sample are cats or dogs.
+
 To compute how many animals are cats or dogs, I will use the which and length function. The which function identifies the locations in the Animal vector where a cat or dog is present. This function will output a vector of locations and the length function can be used to tally the total number of cats or dogs.
 ```{r,include=TRUE}
 length(which(Animal=='cat' | Animal=='dog')) #The which function looks for the locations where the logical operator is true. The "|" allows us to find the places where the observation is a cat or dog.
@@ -45,6 +54,8 @@ There are 44 occurences where the Animal vector had a cat or dog.
 
 **#Part C**
 
+c. Write `R` code to combine the results to produce phrases (character strings) describing the animals as in this example: `big white dog`.
+ 
 I will combine the results to produce phrases (character strings) describing the animals("big white dog") using the paste function. I will print only first ten for simplicity.
 
 ```{r,include=TRUE}
@@ -52,6 +63,8 @@ paste(Attribute,Color,Animal, sep=' ')[1:10]
 ```
 
 **#Part D** 
+
+d. Create a contingency table between `Animal` and `Attribute`.
 
 Creating a contigency table:
 For this problem, I will use the table function:
@@ -62,7 +75,19 @@ This function categorizes the observations by the type of animal and the attribu
 
 ##Matrices
 
+# Matrices
+Consider the following system of linear equations
+\begin{align*}
+x_1+2x_2+3x_3+4x_4+5x_5&=7,\\
+2x_1+x_2+2x_3+3x_4+4x_5&=-1,\\
+3x_1+2x_2+x_3+2x_4+3x_5&=-3,\\
+4x_1+3x_2+2x_3+x_4+2x_5&=5,\\
+5x_1+4x_2+3x_3+2x_4+x_5&=17.
+\end{align*}
+
 **#Part A**
+
+a. Create the matrix `A` and the vector `y` corresponding to the matrix equation $Ax=y$, where $A\in\mathbb R^{5\times 5}$ and $x,y\in\mathbb R^5$.
 
 Create a matrix A and vector y corresponding to matrix equation Ax=y, where A$\in \mathbb{R}^{(5*5)}$ and x, y$\in \mathbb{R}^{5}$:
 To do this, I will first initialize a matrix of zeros that fits the required dimensions. Then, I will assign values corresponding to the given equations. I will form y by the c() function.
@@ -79,6 +104,7 @@ y=c(7,-1,-3,5,17)   #Use c() do initialize y as a vector
 ```
 
 **#Part B**
+b. Determine if the matrix `A` is invertible.
 
 Is matrix A invertible?
 A matrix is invertible when the determinant is non-zero.
@@ -93,6 +119,7 @@ The determinant is non-zero, therefore matrix A is invertible. We can also use t
 
 
 **#Part C**
+c. Find the solution of the system of linear equations.
 
 Find solution of the system of linear equations:
 To find x, we can use the solve() function.
@@ -103,6 +130,8 @@ The solve function calculates x = $A^{-1}y$. The above values are the vector x.
 
 **#part D**
 
+d. Verify that your solution is correct.
+
 Verify the solution is correct:
 To verify, we can conduct matrix multiplication of A and x.
 ```{r,include=TRUE}
@@ -112,9 +141,11 @@ A%*%x
 
 The result is the values of the y vector. Therefore, the solution is verified.
 
-##Data Exploration
+**##Data Exploration**
 
-First load the data using load() function and check for missing values:
+The task is to explore the US census population estimates by county for 2015 from the package `usmap` (load the data frame from `countypop.RData`). The data frame has `3142` rows and `4` variables: `fips` is the 5-digit FIPS code corresponding to the county; `abbr` is the 2-letter state abbreviation; `county` is the full county name; `pop_2015` is the 2015 population estimate (in number of people) for the corresponding county. Each row of the data frame represents a different county or a county equivalent. For the sake of simplicity, when we say a county, that also includes a county equivalent and when we say a state, that also includes the District of Columbia. Answer the following questions.
+
+First, I will load the data using load() function and check for missing values:
 ```{r,include=TRUE}
 load("countypop.RData") #We can also import the dataset using file->open file.
 attach(countypop)
@@ -131,7 +162,8 @@ No missing values are present in data.
 
 **#Part A**
 
-Total of unique 2-letter state abbreviations:
+a. How many unique 2-letter state abbreviations are there?
+
 We can use the table() function to get the list of unique 2-letter options and use the length() to tally them.
 ```{r,include=TRUE}
 length(table(countypop$abbr))
@@ -139,6 +171,8 @@ length(table(countypop$abbr))
 There are 51 unique 2-letter state abbreviations.
 
 **#Part B**
+
+b. What is the total number of counties in the US?
 
 Total number of counties:
 ```{r,include=TRUE}
@@ -153,6 +187,8 @@ The total number of counties in the US is 3142
 
 **#Part C**
 
+c. How many unique county names are there?
+
 Unique county names:
 For this problem, I will use the length() and table() function.
 ```{r,include=TRUE}
@@ -163,8 +199,10 @@ There are 1877 unique county names.
 
 **#part D**
 
+d. What are the top 10 most common county names?
+
 Find the top 10 most common county names:
-To find the top county names, I will use table() to tally the number of times a county name appears and then use sort() to order the output in decreasing order.
+To find the top county names, I will use table() to tally the number of times a county name appears and use sort() to order the output in decreasing order.
 
 ```{r,include=TRUE}
 sort(table(countypop$county), decreasing=TRUE)[1:10] 
@@ -174,8 +212,10 @@ The top 10 most common county names are Washington County, Jefferson County, Fra
 
 **#Part E**
 
+e. Which state has the largest number of counties? Which state has the smallest number of counties?
+
 We want to find the state that has the largest/smallest number of counties.
-To solve this, we would just need to total the number of times each state appears in the data set. I will use the table() and sort() functions.
+To solve this, we need to count the number of times each state appears in the data set. I will use the table() and sort() functions.
 ```{r,include=TRUE}
 table(countypop$abbr)
 sort(table(countypop$abbr),decreasing=TRUE)[1] #This will give us the state with the most counties(decreasing order)
@@ -185,6 +225,8 @@ Texas has the largest number of counties(254) and DC has the smallest number of 
 
 **#Part F**
 
+f. What is the average population of a county in the US?
+
 Average population of a county in the US:
 I will take the average of all counties using mean().
 ```{r,include=TRUE}
@@ -193,6 +235,8 @@ mean(countypop$pop_2015) #This averages all the observations of county populatio
 The exact average population of a county is 102297.5 people. We can say it is approximately 102298 people because we can't have a 0.5 of a person.
 
 **#Part G**
+
+g. Which state has the largest county in terms of population? How many people live in the largest county in terms of population?
 
 We want to find the state that has the largest county in terms of population.
 We can use the max() and which function to find the place that the largest population occurs.
@@ -206,7 +250,9 @@ CA has the largest county in terms of population. 10170292 people live in the la
 
 **#Part H**
 
-Want to find the largest county in terms of population of each of the states:
+h. What is the largest county in terms of population of each of the states?
+
+We want to find the largest county in terms of population of each of the states:
 First, we will use the summarise function to find the max populations by state. Then, we can use the max population and the state abbreviation to find the location of the counties in the countypop data set. We use a logical & to make sure the state and population match(in case of repeated population values for other states).
 ```{r,include=TRUE}
 datalarge=summarise(group_by(countypop,abbr),max(pop_2015)) #Group the data by state and find the max population.
@@ -227,6 +273,8 @@ The largest county in terms of population for each state is presented in the out
 
 **#Part I**
 
+i. What is the average population of the 100 largest counties in the US?
+
 Average population of the 100 largest counties: For this problem, we can organize the pop_2015 column in the countypop data frame in decreasing order. Then, we can take the first 100 observations from the sort() function and use the mean() function to get the average.
 ```{r,include=TRUE}
 orderpop=sort(countypop$pop_2015, decreasing=TRUE)[1:100]
@@ -236,7 +284,10 @@ The average population of the 100 largest counties in the US is 1370079 people.
 
 **#Part J**
 
+j. How many people live in each of the states?
+
 How many people live in each of the states: To do this problem, we will use tapply() and sum() functions. "tapply" allows to apply the sum function to subsets, categorized by the states, of the pop_2015 column. You can also use the summarise function and use group_by() to categorize by state and the use sum() to calculate the total population in each state.
+
 ```{r,include=TRUE}
 tapply(countypop$pop_2015,countypop$abbr,sum)
 #other way
@@ -253,6 +304,8 @@ The total population for each of the states is presented above.
 
 **#Part K**
 
+k. What is the average population of a county in California?
+
 Average population of a county in California:
 For this problem, we will look for the location of the california counties in the countypop data frame. Then, we will use the mean() function to return the average population of a county.
 ```{r,include=TRUE}
@@ -267,7 +320,9 @@ round(mean(CAdata$pop_2015))
 ```
 The average population of a county in calfornia is 674911(round up since we can have a 0.7 of a person)
 
-**#Part I**
+**#Part L**
+
+l. What is the average population of a county in each of the states (2 points)?
 
 Average of a county in each of the states:
 We can use the tapply function to subset the population values with respect to the states and use the mean function.
