@@ -1,0 +1,59 @@
+---
+title: 'STA 141A Spring 2020: Homework 4'
+author: 'Instructor: Vaidotas Characiejus'
+date: "5/18/2020"
+output:
+  html_document:
+    number_sections: no
+---
+
+
+
+The assignment has to be done in an [R Markdown](https://rmarkdown.rstudio.com) document and submitted electronically on Canvas until the deadline of May 29, 2020 at 6:00 PM by uploading two files:
+
+1. an HTML or PDF file;
+2. the Rmd source file.
+
+It is possible to upload two files on Canvas. Late submissions will not be accepted.
+
+Each answer has to be based on `R` code that shows how the result was obtained. `R` code has to answer the question or solve the task. No points will be given for answers that are not based on `R` code. 
+
+The total number of points of this assignment is 30.
+
+Good luck!
+
+
+
+
+# Classification
+
+The goal of this homework assignment is to compare the  $k$-NN classifier, linear discriminant analysis (LDA) and the logistic model in a binary classification problem. 
+
+1. Consider Fisher's `iris` data set. Extract the data corresponding to the flower types  `versicolor` and `virginica`, numbering a total of `100` flowers. Set aside the first `10` observations for each flower type as test data and use the remaining data consisting of `80` observations (with flower types as class labels) as training data (1.5 points).
+
+<p></p>
+
+2. Use LDA for classifying the test data. Use `Sepal.Length` and `Sepal.Width` as the predictor variables (or features)  (1.5 points).
+    a) Report the class-specific means of the predictor variables for the training data (1.5 points).
+    b) Compute the confusion matrix for the test data and the misclassification error rate (1.5 points).
+    
+<p></p>
+
+3. Use the logistic model, fitted to the training data, to classify the test data.
+    a) Fit a logistic model to the training data, using the variables `Sepal.Length` and `Sepal.Width` as predictors (3 points).
+        i. Obtain the estimates and their standard errors for the model parameters (1.5 points).
+        ii. Compute the confusion matrix for the test data and the misclassification error rate (1.5 points).
+        iii. Are both of the predictor variables necessary for the purpose of 
+classification? Explain your answer (3 points).
+    b) Fit a logistic regression model to the training data, using the variable `Sepal.Length` as a one-dimensional predictor (3 points).
+        i. Obtain the estimates and their standard errors for the model parameters (1.5 points).
+        ii. Compute the confusion matrix for the test data, and the misclassification error rate (1.5 points).
+        iii. Compare the results with those in 3(a). Does your result in 3(b)(ii) support the answer to 3(a)(iii) (3 points)?
+        
+<p></p>
+
+4. Use the $k$-nearest neighbors ($k$-NN) classification method to classify the test data, using only `Sepal.Length` as the predictor variable. Perform this analysis using $k=1$ and $k=5$. In each case, compute the confusion matrix for the test data, and the misclassification error rate (3 points).
+
+<p></p>
+
+5. Write a very brief summary (maximum of `100` words) about the comparative performance of the three different classification methods for this data set (3 points).
