@@ -13,6 +13,31 @@ knitr::opts_chunk$set(echo = TRUE)
 
 **Problem 1**
 
+Suppose that $X_1,\ldots,X_n$ are independent and identically distributed (iid) binomial random variables such that
+\[
+  P(X_i=x\mid k,p)
+  ={k\choose x}p^x(1-p)^{k-x},\quad x=0,1,\ldots,k
+\]
+for all $i=1,\ldots,n$. Assume that both $k$ and $p$ are unknown and use the method of moments to obtain point estimators of both parameters. This somewhat unusual application of the binomial model has
+been used to estimate crime rates for crimes that are known to have many unreported
+occurrences. For such a crime, both the true reporting rate, $p$, and the total number
+of occurrences, $k$, are unknown. Equating the first two sample moments to those of the population yields the system
+of equations
+\[
+  \bar X=kp
+  \quad\text{and}\quad
+  \frac1n\sum_{i=1}^nX_i^2=kp(1-p)+k^2p^2,
+\]
+where $\bar X$ is the sample mean. Solving for $k$ and $p$ leads to
+\[
+  \hat k=\frac{\bar X^2}{\bar X-(1/n)\sum_{i=1}^n(X_i-\bar X)^2}
+  \quad\text{and}\quad
+  \hat p=\frac{\bar X}{\hat k}.
+\]
+It is difficult to analyze the performance of $\hat k$ and $\hat p$ analytically so you are asked to perform a simulation study using `R`. The idea is to generate random samples and investigate the performance of $\hat k$ and $\hat p$ using random samples.
+
+1. Generate a single simple random sample of length `n <- 50` from the binomial distribution with the parameters `k <- 10`, `p <- 0.4`.
+
 Generate a single simple random sample of length 50 from the binomial distribution with k=10 and p=0.4. To generate this sample, we can use the rbinom() function.
 ```{r, include=TRUE}
 n=50 #50 observations in the sample
@@ -20,6 +45,8 @@ srand= rbinom(50,10,0.4) #generate the random sample
 ```
 
 **Problem 2**
+
+2. Write a function that takes a sample as its input and returns the estimates of `k` and `p` given above.
 
 We want a function that takes in an input and returns the estimates of k and p. We can write the function using function().
 ```{r, include=TRUE}
@@ -38,6 +65,8 @@ estimates(srand) #Test the function
 The generated values reflect estimates we would get when estimating k and p.
 
 **Problem 3**
+
+3. Generate `N <- 1000` samples of size `n <- 50` (as in the first question) and calculate `N <- 1000` estimates of $k$ and `N <- 1000` estimates of $p$ (6 points if no loops are used in the code, 2 points if any loop (`for`, `while`, `repeat`, etc.) is used in the code ).
 
 Generate N = 1000 samples of size n=50 and calculate 1000 estimates of k and 1000 estimates of p. I will attempt this problem by using matrices and an adjusted function of problem 2.
 ```{r, include=TRUE}
@@ -75,6 +104,8 @@ estimate.mat[1:10,]
 
 **Problem 4**
 
+4. Repeat Question 3 when `n <- 100` and when `n <- 250`.
+
 Repeat problem 3 when n=100 and n=250. We can use the same function from 3. We just need to remember to change n.
 ```{r, include=TRUE}
 #When n=100:
@@ -97,6 +128,8 @@ estimate.mat3[1:10,]
 ```
 
 **Problem 5**
+
+5. Estimate the bias and the mean squared error (MSE) of $\hat k$ and the bias and the MSE of $\hat p$ for each sample size (`n <- 50`, `n <- 100` and `n <- 250`). Do the estimators seem to overestimate or underestimate the parameters? How do the bias and the MSE change when the sample size increases?.
 
 For each sample size, we will approximate the bias and mean squared error of $\hat{k}$ and $\hat{p}$:
 ```{r, include=TRUE}
@@ -134,7 +167,10 @@ result3
 The estimators seem to overestimate the parameters. We can make this conclusion because the bias for $\hat{k}$ and $\hat{p}$ are positive for all n. When sample size increases, the bias and MSE for $\hat{k}$ and $\hat{p}$ decrease. This makes sense because, as the sample size increases, our estimate should get closer and closer to the population parameters k and p(law of large numbers).
 
 **Problem 6**
+
 **Part A:**
+
+  a. Make a single plot using `ggplot2` that contains three box plots of the estimates of the parameter `k` when `n <- 50`, `n <- 100`, `n <- 250` (the first from the left box plot has to describe the estimates when `n <- 50`, the second from the left box plot has to describe the estimates when `n <- 100` and the third from the left box plot has to describe the estimates `n <- 250`). Include the true value of the parameter as a horizontal line (`geom_hline()` and use the argument `color`) and label the plot appropriately.
 
 The goal is to use ggplot to generate 3 box plots of the parameter estimates for when n=50, 100, and 200. We also have to include the true value of the parameter using geom_hline.
 ```{r, include=TRUE}
@@ -151,10 +187,11 @@ colnames(boxplotdata)=c("k_estimates","values_n")
 boxplotdata$values_n=as.factor(boxplotdata$values_n) 
 #Full boxplot
 ggplot(data = boxplotdata, mapping = aes(x=values_n,y=k_estimates))+ geom_boxplot() + geom_hline(yintercept=10, color="red")+ggtitle("Box Plots For Estimates of k") +labs(y= "Estimates of k", x = "Sample Size n")
-
 ```
 
 **Part B:**
+
+b. $\hat k$ can obtain values that are far away from the true value of the parameter when the sample size is small and the box plots might not be particularly informative in such a situation. Remove the estimates from the plot that are outside of the interval $[0,50]$ so that the box plots are more informative.
 
 The previous graph is not informative because some of the $\hat{k}$ values are far away from the true value of the parameter. To remove estimates from the plot that are outside of the interval [0,50], we can use the filter() function.
 ```{r, include=TRUE}
@@ -170,7 +207,9 @@ After putting a constraint on the values, the boxplots are much more useful and 
 
 **Part C:**
 
-Using the same methods as before, we can create the boxplots for estimates of p.
+c. Make the same plot with three box plots for the estimates of the parameter `p` (b part does not apply here).
+
+Using the same methods as before, we can create the boxplots for the p estimates.
 ```{r, include=TRUE}
 #put all p estimates into one vector
 Pvals=c(estimate.mat[,2],estimate.mat2[,2],estimate.mat3[,2]) 
@@ -185,5 +224,7 @@ ggplot(data = Pdata, mapping = aes(x=nvalues,y=pvals))+ geom_boxplot() + geom_hl
 ```
 
 **Part D:**
+
+d. Describe how both of these plots change when the sample size increases.
 
 When the sample size increases, we can see, in both plots, that the spread of the estimated values becomes smaller. In other words, the variance of the estimated parameters decreases(the distance between quartiles decreases). We can also see the  mean of the estimates gets closer to the true parameter value.
