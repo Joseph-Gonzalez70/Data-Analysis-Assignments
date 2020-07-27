@@ -55,11 +55,11 @@ estimates = function(sinput){
   n=length(srand) #size of sample
   smean=mean(sinput) #mean of sample
   sumdiff=sum((sinput-smean)^2) #The sum of the squared difference between the x values and the mean
- khat=(smean^2)/(smean-(1/n)*sumdiff) #estimate of k
- phat=smean/khat #estimate of p
- 
+  khat=(smean^2)/(smean-(1/n)*sumdiff) #estimate of k
+  phat=smean/khat #estimate of p
 return(c(khat,phat)) #To return estimates of k and p 
 }
+
 estimates(srand) #Test the function
 ```
 The generated values reflect estimates we would get when estimating k and p.
@@ -88,9 +88,9 @@ sumdiff=function(values){
 }
 
 estimates2 = function(sampmatrix){
-    smeans=apply(sampmatrix,2,mean)#mean of all 1000 samples
+    smeans=apply(sampmatrix,2,mean) #mean of all 1000 samples
     sumdiffs=apply(sampmatrix,2,sumdiff) 
-    #  sumdiffs is the sum of the squared difference between the x values and 
+    #sumdiffs is the sum of the squared difference between the x values and 
     #the mean for all columns
     khat=(smeans^2)/(smeans-(1/n)*sumdiffs) #estimates of k
     phat=smeans/khat #estimates of p
@@ -141,25 +141,29 @@ For each sample size, we will approximate the bias and mean squared error of $\h
 #mean squared error for khat and phat. The function will take in the
 #1000 by 2 matrix of estimates for k and p. 
 #It will also return a 2 by 2 matrix with the estimated values.
+
 Bias_MSE_funct=function(nummat){
-avgkhat=mean(nummat[,1]) #Average of the khats(expectation)
-biask=avgkhat-10 #Bias is the expected value minus the true value(10)
-MSEk=biask^2+var(nummat[,1]) #MSE is equal to the sum of the bias squared and the variance of khat.
-#For phat:
-avgphat=mean(nummat[,2])
-biasp=avgphat-0.4
-MSEp=biasp^2+var(estimate.mat[,2])
-results=matrix(c(biask,biasp,MSEk,MSEp),2,2, byrow=TRUE) #Create a 2 by 2 matrix with the estimates.
-colnames(results)=c("khat","phat") #Label the rows and columns
-rownames(results)=c("Bias" , "MSE")
-return(results)
+    avgkhat=mean(nummat[,1]) #Average of the khats(expectation)
+    biask=avgkhat-10 #Bias is the expected value minus the true value(10)
+    MSEk=biask^2+var(nummat[,1]) #MSE is equal to the sum of the bias squared and the variance of khat.
+    #For phat:
+    avgphat=mean(nummat[,2])
+    biasp=avgphat-0.4
+    MSEp=biasp^2+var(estimate.mat[,2])
+    results=matrix(c(biask,biasp,MSEk,MSEp),2,2, byrow=TRUE) #Create a 2 by 2 matrix with the estimates.
+    colnames(results)=c("khat","phat") #Label the rows and columns
+    rownames(results)=c("Bias" , "MSE")
+    return(results)
 }
+
 #First, we start with n=50
 result=Bias_MSE_funct(estimate.mat)
 result
+
 #n=100
 result2=Bias_MSE_funct(estimate.mat2)
 result2
+
 #n=250
 result3=Bias_MSE_funct(estimate.mat3)
 result3
@@ -213,9 +217,11 @@ Using the same methods as before, we can create the boxplots for the p estimates
 ```{r, include=TRUE}
 #put all p estimates into one vector
 Pvals=c(estimate.mat[,2],estimate.mat2[,2],estimate.mat3[,2]) 
+
 #Then, we create a vector that contains the sample sizes
 #The locations of n correspond to the correct p estimates
 nvalues=c(rep(50,1000),rep(100,1000),rep(250,1000))
+
 #Create data frame that combines the p estimates vector and sample size vector
 Pdata=data.frame(cbind(Pvals,nvalues))
 colnames(Pdata)=c("pvals","nvalues")
